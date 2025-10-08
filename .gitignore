@@ -1,0 +1,69 @@
+# Dependency lock files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Build output
+dist
+dist-ssr
+build
+out
+coverage
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Node modules
+node_modules/
+
+# IDE/editor settings
+.vscode/
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS-specific
+*.swp
+*.bak
+*.tmp
+*.orig
+
+# TypeScript
+*.tsbuildinfo
+
+# Misc
+*.local
+*.log.*
+*.tgz
+*.gz
+*.zip
+*.7z
+
+# Optional: Ignore test snapshots
+__snapshots__/
+*.snap
