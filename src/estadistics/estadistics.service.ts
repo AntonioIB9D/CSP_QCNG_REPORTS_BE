@@ -96,6 +96,23 @@ export class EstadisticsService {
     return filteredData;
   }
 
+  // Get data by view,box model and start and end date
+  async findDataByDate(term: string, view: string, start: string, end: string) {
+    const producto = term === 'ldModel' ? 'LD%' : 'SD%';
+    const fechaInicio = new Date(start);
+    const fechaFin = new Date(end);
+    fechaFin.setHours(23, 59, 59, 999); // Ajustar la fecha de finalización al final del día
+    const data = await this.getDataByZone(producto, fechaInicio, fechaFin);
+    const zonas: string[] =
+      ViewZones[producto as ProductKey]?.[view as ViewName] ?? [];
+    if (zonas) {
+      const filteredData = data.filter((item) => zonas.includes(item.zona));
+      return filteredData;
+    }
+    return [];
+  }
+
+  // Get data by product, start and end date
   private async getDataByZone(
     producto: string,
     fechaInicio: Date,

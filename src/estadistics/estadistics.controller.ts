@@ -11,11 +11,23 @@ export class EstadisticsController {
     return this.estadisticsService.findData();
   }
 
+  //Endpoint to get data by model and selected view
   @Get(':model/:selectedView')
   findDataByView(
     @Param('model') term: string,
     @Param('selectedView') view: string,
   ) {
     return this.estadisticsService.findDataByView(term, view);
+  }
+
+  //Endpoint to get data by model and selected view and start and end date
+  @Get(':model/:selectedView/:start/:end')
+  findDataByDate(
+    @Param('model') term: string,
+    @Param('selectedView') view: string,
+    @Param('start') start: string,
+    @Param('end') end: string,
+  ) {
+    return this.estadisticsService.findDataByDate(term, view, start, end);
   }
 }
