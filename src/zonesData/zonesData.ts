@@ -1,5 +1,17 @@
-//Zonas por vista
-export const ViewZones = {
+export type ProductKey = 'LD%' | 'SD%';
+
+export type ViewName =
+  | 'Top_Left_View'
+  | 'Top_Right_View'
+  | 'Back_View'
+  | 'Left_View'
+  | 'Bottom_View'
+  | 'Right_View'
+  | 'Corner_View';
+
+export type ViewZonesType = Record<ProductKey, Record<ViewName, string[]>>;
+
+export const ViewZones: ViewZonesType = {
   'LD%': {
     Top_Left_View: [
       'FL 1 LH',

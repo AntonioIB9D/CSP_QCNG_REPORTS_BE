@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Estadistic } from './entities/estadistic.entity';
-import { Repository } from 'typeorm';
+import { Between, Like, Repository } from 'typeorm';
+import { ProductKey, ViewName, ViewZones } from 'src/zonesData/zonesData';
 
 @Injectable()
 export class EstadisticsService {
@@ -57,6 +58,7 @@ export class EstadisticsService {
     return topFiveByProcess;
   }
 
+  // Get all data to charts by station
   private async getData(initialDate: Date) {
     return await this.dataRepository.find({
       where: {
@@ -68,6 +70,47 @@ export class EstadisticsService {
         zona: true,
         folio: true,
         proceso: true,
+        fecha_rechazo: true,
+      },
+    });
+  }
+
+  // Get data by view and box model
+  async findDataByView(term: string, view: string) {
+    // Variable producto para identificar que modelo de caja recibimos del Front
+    const producto = term === 'ldModel' ? 'LD%' : 'SD%';
+    //Fecha estimada de Inicio
+    const fechaInicio = new Date('2025-01-01');
+    //Fecha actual
+    const fechaFin = new Date();
+    fechaFin.setHours(23, 59, 59, 999);
+
+    //Retorno de la DATA de la BD CQNG
+    const data = await this.getDataByZone(producto, fechaInicio, fechaFin);
+
+    const zonas: string[] =
+      ViewZones[producto as ProductKey]?.[view as ViewName] ?? [];
+
+    const filteredData = data.filter((item) => zonas.includes(item.zona));
+
+    return filteredData;
+  }
+
+  private async getDataByZone(
+    producto: string,
+    fechaInicio: Date,
+    fechaFin: Date,
+  ) {
+    return await this.dataRepository.find({
+      where: {
+        producto: Like(producto),
+        fecha_rechazo: Between(fechaInicio, fechaFin),
+      },
+      select: {
+        producto: true,
+        defecto: true,
+        zona: true,
+        folio: true,
         fecha_rechazo: true,
       },
     });
