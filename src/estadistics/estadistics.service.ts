@@ -22,12 +22,8 @@ export class EstadisticsService {
     const initialDate = new Date();
     initialDate.setHours(0, 0, 0, 0); // Normalización de horas iniciales
 
-    console.log('initialDate', initialDate);
-
     //Retorno de la DATA de la BD CQNG
     const data = await this.getData(initialDate);
-
-    console.log('data', data);
 
     // Data agrupara por procesos
     const groupedData = data.reduce<Record<string, Record<string, number>>>(
@@ -78,27 +74,25 @@ export class EstadisticsService {
   // Get data by view and box model
   async findDataByView(term: string, view: string) {
     // Variable producto para identificar que modelo de caja recibimos del Front
-    const producto = term === 'ldModel' ? 'LD%' : 'SD%';
-    //Fecha estimada de Inicio
-    const fechaInicio = new Date('2025-01-01');
-    //Fecha actual
-    const fechaFin = new Date();
-    fechaFin.setHours(23, 59, 59, 999);
+    const producto = term === 'LD' ? 'LD%' : 'SD%';
+    console.log('Producto: ', producto);
+    //Fecha Actual
+    const fechaInicio = new Date();
 
     //Retorno de la DATA de la BD CQNG
-    const data = await this.getDataByZone(producto, fechaInicio, fechaFin);
+    const data = await this.getDataByZone(producto, fechaInicio);
 
     const zonas: string[] =
       ViewZones[producto as ProductKey]?.[view as ViewName] ?? [];
 
-    const filteredData = data.filter((item) => zonas.includes(item.zona));
+    const filteredData = data?.filter((item) => zonas.includes(item.zona));
 
     return filteredData;
   }
 
   // Get data by view,box model and start and end date
   async findDataByDate(term: string, view: string, start: string, end: string) {
-    const producto = term === 'ldModel' ? 'LD%' : 'SD%';
+    const producto = term === 'LD' ? 'LD%' : 'SD%';
     const fechaInicio = new Date(start);
     const fechaFin = new Date(end);
     fechaFin.setHours(23, 59, 59, 999); // Ajustar la fecha de finalización al final del día
@@ -116,12 +110,27 @@ export class EstadisticsService {
   private async getDataByZone(
     producto: string,
     fechaInicio: Date,
-    fechaFin: Date,
+    fechaFin?: Date,
   ) {
+    if (fechaFin) {
+      return await this.dataRepository.find({
+        where: {
+          producto: Like(producto),
+          fecha_rechazo: Between(fechaInicio, fechaFin),
+        },
+        select: {
+          producto: true,
+          defecto: true,
+          zona: true,
+          folio: true,
+          fecha_rechazo: true,
+        },
+      });
+    }
     return await this.dataRepository.find({
       where: {
         producto: Like(producto),
-        fecha_rechazo: Between(fechaInicio, fechaFin),
+        fecha_rechazo: fechaInicio,
       },
       select: {
         producto: true,
