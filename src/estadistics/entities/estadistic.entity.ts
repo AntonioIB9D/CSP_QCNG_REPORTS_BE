@@ -19,4 +19,10 @@ export class Estadistic {
 
   @Column({ type: 'date' })
   fecha_rechazo: Date;
+
+  @Column()
+  fecha_alta: string;
+
+  @Column()
+  turno: number;
 }

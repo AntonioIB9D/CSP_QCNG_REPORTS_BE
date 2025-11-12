@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Estadistic } from './entities/estadistic.entity';
 import { Between, Like, Repository } from 'typeorm';
 import { ProductKey, ViewName, ViewZones } from 'src/zonesData/zonesData';
+import { toZonedTime } from 'date-fns-tz';
 
 @Injectable()
 export class EstadisticsService {
@@ -67,8 +68,66 @@ export class EstadisticsService {
         folio: true,
         proceso: true,
         fecha_rechazo: true,
+        fecha_alta: true,
+        turno: true,
       },
     });
+  }
+
+  private getTurno(fechaUTC: Date | string): string {
+    const localDate = toZonedTime(new Date(fechaUTC), 'America/Tijuana');
+    const hour = localDate.getHours();
+    const minute = localDate.getMinutes();
+
+    if (hour < 6 || (hour === 6 && minute === 0)) {
+      return '1';
+    } else if (hour < 15 || (hour === 15 && minute <= 35)) {
+      return '2';
+    } else {
+      return '3';
+    }
+  }
+
+  //Get total defects quantity by station
+  async findTotalDefects() {
+    const lineProcess = ['DRILL', 'INSP. PINTURA', 'ENSAMBLE FINAL', 'D-FLASH'];
+    const initialDate = new Date();
+    initialDate.setHours(0, 0, 0, 0); // Normalización de horas iniciales
+
+    //Retorno de la DATA de la BD CQNG
+    const data = await this.getData(initialDate);
+
+    console.log(data);
+    // Data agrupara por procesos
+    const groupedData = data.reduce<
+      Record<string, Record<string, Record<string, number>>>
+    >((acc, item) => {
+      const { proceso, defecto, fecha_alta } = item;
+      const turno = this.getTurno(fecha_alta); // ← aquí normalizas y clasificas
+
+      if (lineProcess.includes(proceso)) {
+        if (!acc[proceso]) acc[proceso] = {};
+        if (!acc[proceso][turno]) acc[proceso][turno] = {};
+        acc[proceso][turno][defecto] = (acc[proceso][turno][defecto] || 0) + 1;
+      }
+      return acc;
+    }, {});
+
+    // 🔢 Transformar a totales por proceso y turno
+    const totalByProcessAndShift: Record<string, Record<string, number>> = {};
+
+    for (const [proceso, turnos] of Object.entries(groupedData)) {
+      totalByProcessAndShift[proceso] = {};
+      for (const [turno, defectos] of Object.entries(turnos)) {
+        const total = Object.values(defectos).reduce(
+          (sum, count) => sum + count,
+          0,
+        );
+        totalByProcessAndShift[proceso][turno] = total;
+      }
+    }
+
+    return totalByProcessAndShift;
   }
 
   // Get data by view and box model

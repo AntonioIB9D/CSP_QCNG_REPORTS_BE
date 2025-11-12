@@ -11,6 +11,12 @@ export class EstadisticsController {
     return this.estadisticsService.findData();
   }
 
+  //Endpoint to get total defects quantity by station
+  @Get('/data/stationTotalDefects')
+  findTotalDefects() {
+    return this.estadisticsService.findTotalDefects();
+  }
+
   //Endpoint to get data by model and selected view
   @Get(':model/:selectedView')
   findDataByView(
