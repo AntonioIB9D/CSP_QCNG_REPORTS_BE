@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Estadistic } from './entities/estadistic.entity';
-import { Between, Like, Repository } from 'typeorm';
+import { Between, In, Like, Repository } from 'typeorm';
 import { ProductKey, ViewName, ViewZones } from 'src/zonesData/zonesData';
 import { toZonedTime } from 'date-fns-tz';
 
@@ -60,16 +60,7 @@ export class EstadisticsService {
     return await this.dataRepository.find({
       where: {
         fecha_rechazo: initialDate,
-      },
-      select: {
-        producto: true,
-        defecto: true,
-        zona: true,
-        folio: true,
-        proceso: true,
-        fecha_rechazo: true,
-        fecha_alta: true,
-        turno: true,
+        proceso: In(['DRILL', 'INSP. PINTURA', 'ENSAMBLE FINAL', 'D-FLASH']),
       },
     });
   }
@@ -97,7 +88,6 @@ export class EstadisticsService {
     //Retorno de la DATA de la BD CQNG
     const data = await this.getData(initialDate);
 
-    console.log(data);
     // Data agrupara por procesos
     const groupedData = data.reduce<
       Record<string, Record<string, Record<string, number>>>

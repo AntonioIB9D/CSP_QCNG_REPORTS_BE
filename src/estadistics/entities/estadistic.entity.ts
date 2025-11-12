@@ -3,7 +3,10 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 @Entity('registros')
 export class Estadistic {
   @PrimaryGeneratedColumn()
-  folio: number;
+  pk1: number; // ← clave primaria real
+
+  @Column()
+  folio: number; // ← ahora es solo un campo normal
 
   @Column()
   producto: string;
@@ -18,11 +21,8 @@ export class Estadistic {
   proceso: string;
 
   @Column({ type: 'date' })
-  fecha_rechazo: Date;
+  fecha_rechazo: Date | string;
 
-  @Column()
-  fecha_alta: string;
-
-  @Column()
-  turno: number;
+  @Column({ type: 'timestamp' })
+  fecha_alta: Date;
 }
