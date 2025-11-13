@@ -25,4 +25,19 @@ export class Estadistic {
 
   @Column({ type: 'timestamp' })
   fecha_alta: Date;
+
+  @Column()
+  cavidad: string;
+
+  @Column()
+  prensa: string;
+
+  @Column()
+  serie: string;
+
+  @Column()
+  usuario_alta: string;
+
+  @Column()
+  estatus: string;
 }

@@ -17,6 +17,12 @@ export class EstadisticsController {
     return this.estadisticsService.findTotalDefects();
   }
 
+  //Endpoint to get the last registered defect
+  @Get('/data/findLastRegisteredDefect')
+  findLastRegisteredDefect() {
+    return this.estadisticsService.findLastRegisteredDefect();
+  }
+
   //Endpoint to get data by model and selected view
   @Get(':model/:selectedView')
   findDataByView(

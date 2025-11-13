@@ -79,6 +79,22 @@ export class EstadisticsService {
     }
   }
 
+  async findLastRegisteredDefect() {
+    const initialDate = new Date();
+    initialDate.setHours(0, 0, 0, 0); // Normalización de horas iniciales
+
+    const data = await this.dataRepository.findOne({
+      where: {
+        fecha_rechazo: initialDate,
+        proceso: In(['DRILL', 'INSP. PINTURA', 'ENSAMBLE FINAL', 'D-FLASH']),
+      },
+      order: {
+        fecha_alta: 'DESC',
+      },
+    });
+    return data;
+  }
+
   //Get total defects quantity by station
   async findTotalDefects() {
     const lineProcess = ['DRILL', 'INSP. PINTURA', 'ENSAMBLE FINAL', 'D-FLASH'];
