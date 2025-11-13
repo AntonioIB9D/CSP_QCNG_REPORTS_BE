@@ -70,13 +70,20 @@ export class EstadisticsService {
     const hour = localDate.getHours();
     const minute = localDate.getMinutes();
 
-    if (hour < 6 || (hour === 6 && minute === 0)) {
+    const totalMinutes = hour * 60 + minute;
+
+    // Turno 1: 23:45 (1425) → 06:05 (365)
+    if (totalMinutes >= 1425 || totalMinutes < 365) {
       return '1';
-    } else if (hour < 15 || (hour === 15 && minute <= 35)) {
-      return '2';
-    } else {
-      return '3';
     }
+
+    // Turno 2: 06:05 (365) → 15:35 (935)
+    if (totalMinutes >= 365 && totalMinutes < 935) {
+      return '2';
+    }
+
+    // Turno 3: 15:35 (935) → 23:45 (1425)
+    return '3';
   }
 
   async findLastRegisteredDefect() {
