@@ -140,7 +140,10 @@ export class EstadisticsService {
       }
     }
 
-    return totalByProcessAndShift;
+    return {
+      Defects: totalByProcessAndShift,
+      ReportData: groupedData,
+    };
   }
 
   // Get data by view and box model
